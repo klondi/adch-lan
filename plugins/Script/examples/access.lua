@@ -76,6 +76,7 @@ command_contexts = {
 }
 
 level_op = 3 -- kept in sync with settings.oplevel
+level_adm = 5  -- kept in sync with settings.admlevel
 
 local os = base.require('os')
 local json = base.require('json')
@@ -269,6 +270,20 @@ settings.oplevel = {
 	level = true,
 
 	value = 3
+}
+
+settings.admlevel = {
+        alias = { leveladm = true },
+
+        change = function()
+        	level_adm = settings.admlevel.value
+        end,
+
+        help = "minimum level for administrator users, all users >= this level will have administrator rights",
+
+        level = true,
+
+        value = 5
 }
 
 settings.minchatlevel = {
@@ -567,6 +582,11 @@ end
 function is_op(c)
 	return has_level(c, settings.oplevel.value)
 end
+
+function is_adm(c)
+        return has_level(c, settings.admlevel.value)
+end
+
 
 local function update_user(user, cid, nick)
 	-- only one of nick and cid may be updated...
@@ -1688,6 +1708,7 @@ local function onReceive(entity, cmd, ok)
 		return false
 	end
 
+	--TODO: check for reverse connection
 	if c:getState() == adchpp.Entity_STATE_NORMAL then
 		local restricted = restricted_commands[cmd:getCommand()]
 		if restricted and get_level(c) < restricted.level then
