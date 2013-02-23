@@ -9,5 +9,8 @@
 		<Script>access.bot.lua</Script>
 		<Script>motd.lua</Script>
 		<Script>history.lua</Script>
+		<Script>autolevel.lua</Script>
+		<Script>opchat.lua</Script>
+		<Script>redirall.lua</Script>
 	</Engine>
 </ScriptPlugin>
