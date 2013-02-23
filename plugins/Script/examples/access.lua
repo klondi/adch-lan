@@ -164,6 +164,7 @@ function validate_de(new)
 end
 
 local function validate_fo(new)
+	local char
 	for _, char in base.ipairs({ string.byte(new.value, 1, #new.value) }) do
 		if char < 33 then
 			return "the failover addresses can't contain any new line, tabulation nor spaces"
@@ -175,6 +176,7 @@ local function recheck_info()
 	local entities = cm:getEntities()
 	local size = entities:size()
 	if size > 0 then
+		local i
 		for i = 0, size - 1 do
 			local c = entities[i]:asClient()
 			if c then
@@ -398,6 +400,7 @@ function registered_users()
 	local ret = {}
 	local nicksdone = {}
 
+	local user
 	for _, user in base.pairs(users.cids) do
 		table.insert(ret, user)
 		if user.nick then
@@ -427,6 +430,7 @@ local function load_users()
 		return
 	end
 
+	local user
 	for _, user in base.pairs(list) do
 		if user.cid then
 			users.cids[user.cid] = user
@@ -476,6 +480,7 @@ local function load_settings()
 		return false
 	end
 
+	local k, v
 	for k, v in base.pairs(list) do
 		if settings[k] then
 			local change = settings[k].value ~= v
@@ -494,6 +499,7 @@ end
 
 local function save_settings()
 	local list = {}
+	local k, v
 	for k, v in base.pairs(settings) do
 		list[k] = v.value
 	end
@@ -650,6 +656,7 @@ function register_user(cid, nick, password, level, regby)
 end
 
 function unregister_user(cid, nick)
+	local k, v
 	if cid then
 		users.cids[cid] = nil
 		for k, v in base.pairs(users.nicks) do
@@ -680,6 +687,7 @@ end
 send_user_commands = function(c)
 	local names = {}
 	local list = {}
+	local k, v
 	for k, v in base.pairs(commands) do
 		if (not v.protected) or (v.protected and v.protected(c)) then
 			local name = get_ucmd_name(k, v)
@@ -705,6 +713,7 @@ send_user_commands = function(c)
 			params = command.user_command.params
 		end
 		if params then
+			local param
 			for _, param in base.ipairs(params) do
 				str = str .. " " .. param
 			end
@@ -718,6 +727,7 @@ send_user_commands = function(c)
 		c:send(ucmd)
 	end
 
+	local name
 	for _, name in base.ipairs(list) do
 		local internal_name = names[name]
 		local command = commands[internal_name]
@@ -752,6 +762,7 @@ remove_user_commands = function(c)
 		:addParam("CT", base.tostring(context)))
 	end
 
+	local k, v
 	for k, v in base.pairs(commands) do
 		local name = get_ucmd_name(k, v)
 		send_ucmd(name, 1)
@@ -792,6 +803,7 @@ local function send_hub_info(c)
 		local ss = 0
 		local sf = 0
 		if uc > 0 then
+			local i
 			for i = 0, uc - 1 do
 				local entity = entities[i]
 				local ss_ = entity:getField("SS")
@@ -869,6 +881,7 @@ local function onSUP(c, cmd)
 end
 
 local function onINF(c, cmd)
+	local field, regex
 	for field, regex in base.pairs(inf_fields) do
 		val = cmd:getParam(field, 0)
 		if #val > 0 and not val:match(regex) then
@@ -1020,6 +1033,7 @@ local function gen_cfg_list()
 		return
 	end
 	local list = {}
+	local k, v
 	for k, v in base.pairs(settings) do
 		local str = cut_str(v.help or "no information", 30)
 		str = string.gsub(str, '/', '//')
@@ -1058,6 +1072,7 @@ commands.cfg = {
 		end
 
 		local setting = nil
+		local k, v
 		for k, v in base.pairs(settings) do
 			if k == name or (v.alias and v.alias[name]) then
 				setting = v
@@ -1130,6 +1145,7 @@ commands.cfg = {
 
 	helplong = function()
 		local list = {}
+		local k, v, k_alias, v_alias
 		for k, v in base.pairs(settings) do
 			local str = k .. " - current value: " .. base.tostring(v.value)
 			if v.help then
@@ -1169,6 +1185,7 @@ commands.help = {
 			end
 			if v.alias then
 				local list_alias = {}
+				local k_alias, v_alias
 				for k_alias, v_alias in base.pairs(v.alias) do
 					table.insert(list_alias, "+" .. k_alias)
 				end
@@ -1183,6 +1200,7 @@ commands.help = {
 
 			local command = nil
 			local partials = {}
+			local k, v, a
 			for k, v in base.pairs(commands) do
 				if k == parameters or (v.alias and v.alias[parameters]) then
 					command = { k = k, v = v }
@@ -1263,6 +1281,7 @@ commands.info = {
 
 		local str
 
+		local v
 		if #parameters > 0 then
 			local user = cm:findByNick(parameters) -- by nick
 			if not user then
@@ -1313,6 +1332,7 @@ commands.info = {
 				local users_ip = {}
 				local entities = cm:getEntities()
 				local size = entities:size()
+				local i
 				if size > 0 then
 					for i = 0, size - 1 do
 						local user_c = entities[i]:asClient()
@@ -1350,6 +1370,7 @@ commands.info = {
 			str = str .. "Script uptime: " .. format_seconds(scripttime) .. "\n"
 
 			str = str .. "\nADC and script commands: \n"
+			local k
 			for k, v in base.pairs(stats) do
 				str = str .. v .. "\t" .. k .. "\n"
 			end
@@ -1407,6 +1428,7 @@ commands.listregs = {
 		local param = string.lower(parameters)
 
 		local list = {}
+		local v
 		for _, v in base.ipairs(registered_users()) do
 			local other_level = v.level
 			if not other_level then other_level = 0 end
@@ -1653,6 +1675,7 @@ function handle_plus_command(c, msg)
 	local command, parameters = msg:match("^%+(%a+) ?(.*)")
 	if command then
 		command = string.lower(command)
+		local k, v
 		for k, v in base.pairs(commands) do
 			if k == command or (v.alias and v.alias[command]) then
 				add_stats('+' .. command)
@@ -1727,6 +1750,7 @@ local function onReceive(entity, cmd, ok)
 	local ret = true
 	local handler = handlers[cmd:getCommand()]
 	if handler then
+		local v
 		for _, v in base.pairs(handler) do
 			ret = v(c, cmd) and ret
 		end
