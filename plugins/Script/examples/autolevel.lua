@@ -89,7 +89,7 @@ local min_share_l1 = access.settings.min_share_lvl1.value
 local min_files_l1 = access.settings.min_files_lvl1.value
 
 local function ip2int (ip)
-	local ret = 0
+	local ret = 0, s
 	for s in string.gmatch(ip, "%d+") do
 		ret = ret * 256 + s
 	end
@@ -117,6 +117,7 @@ local function relevel ()
 	local size = entities:size()
         local i = 0
 	if size > 0 then
+		local i
 		for i = 0, size - 1 do
 			local c = entities[i]:asClient()
 			if c then
