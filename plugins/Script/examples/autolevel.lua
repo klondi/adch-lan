@@ -24,64 +24,64 @@ local sm = adchpp.getSM()
 local lm = adchpp.getLM()
 
 access.add_setting('min_share_lvl1', {
-        alias = { },
+	alias = { },
 
-        help = "Minimum share size to get to level 1",
+	help = "Minimum share size to get to level 1",
 
-        value = 0,
+	value = 0,
 
-        change = relevel
+	change = relevel
 })
 
 access.add_setting('min_files_lvl1', {
-        alias = { },
+	alias = { },
 
-        help = "Minimum number of files shared to get to level 1",
+	help = "Minimum number of files shared to get to level 1",
 
-        value = 0,
+	value = 0,
 
-        change = relevel
+	change = relevel
 })
 
 access.add_setting('range1_begin', {
-        alias = { },
+	alias = { },
 
-        help = "Ip where the local range 1 begins",
+	help = "Ip where the local range 1 begins",
 
-        value = "0.0.0.0",
+	value = "0.0.0.0",
 
-        change = relevel
+	change = relevel
 })
 
 access.add_setting('range1_end', {
-        alias = { },
+	alias = { },
 
-        help = "Ip where the local range 1 ends",
+	help = "Ip where the local range 1 ends",
 
-        value = "255.255.255.255",
+	value = "255.255.255.255",
 
-        change = relevel
+	change = relevel
 })
 
 
 access.add_setting('range2_begin', {
-        alias = { },
+	alias = { },
 
-        help = "Ip where the local range 2 begins",
+	help = "Ip where the local range 2 begins",
 
-        value = "10.0.0.0",
+	value = "10.0.0.0",
 
-        change = relevel
+	change = relevel
 })
 
 access.add_setting('range2_end', {
-        alias = { },
+	alias = { },
 
-        help = "Ip where the local range 2 ends",
+	help = "Ip where the local range 2 ends",
 
-        value = "10.255.255.255",
+	value = "10.255.255.255",
 
-        change = relevel
+	change = relevel
 })
 
 
@@ -115,7 +115,6 @@ local function relevel ()
 	range2end   = ip2int(access.settings.range2_end.value)
 	local entities = cm:getEntities()
 	local size = entities:size()
-        local i = 0
 	if size > 0 then
 		for i = 0, size - 1 do
 			local c = entities[i]:asClient()

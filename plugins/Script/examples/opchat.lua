@@ -118,14 +118,13 @@ local function onMSG(c, cmd)
 		local mass_cmd = adchpp.AdcCommand(adchpp.AdcCommand_CMD_MSG, adchpp.AdcCommand_TYPE_DIRECT, c:getSID()+0)
 		:addParam(msg)
 		:addParam("PM", adchpp.AdcCommand_fromSID(opchat_bot:getSID()+0))
-            
+		
 		local entities = cm:getEntities()
 		local size = entities:size()
 		if size == 0 then
 			return false
 		end
 
-		local i = 0
 		for i = 0, size - 1 do
 			local other = entities[i]:asClient()
 			if other and is_op(other) then
@@ -138,7 +137,7 @@ local function onMSG(c, cmd)
 			autil.reply(c, 'Your message was sent')
 		end
 		return false
-        end
+	end
 	return true
 end
 
