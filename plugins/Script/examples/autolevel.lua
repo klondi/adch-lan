@@ -207,8 +207,8 @@ access.register_handler(adchpp.AdcCommand_CMD_INF, (function(entity, cmd)
 end))
 
 --Required because access otherwise keeps 0
-autolevel_1 = cm:signalState():connect(function(entity)
-	if entity:getState() == adchpp.Entity_STATE_NORMAL then
+autolevel_1 = cm:signalState():connect(function(entity, oldstate)
+	if entity:getState() == adchpp.Entity_STATE_NORMAL and oldstate ~= adchpp.Entity_STATE_DATA then
 		local c = entity:asClient()
 		if c then
 			autolevel(c,get_int_field(c,"SS"),get_int_field(c,"SF"))
