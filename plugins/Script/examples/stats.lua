@@ -1,5 +1,5 @@
 -- Collects several hub parameters and outputs a CSV file for statistical purposes
--- Requires: bloom plugin, and a sub-folder created on the script folder called 'Stats' with write permissions for adchppd
+-- Requires: bloom plugin
 
 local base = _G
 
@@ -19,7 +19,7 @@ local lm = adchpp.getLM() -- Log manager
 local sm = adchpp.getSM() -- Socket manager
 local bm = badchpp.getBM() -- Bloom manager
 
-local folder = "Stats"
+local folder = "FL_DataBase"
 local scriptPath = base.scriptPath .. '/'
 local statsPath = scriptPath .. folder .. '/'
 local statsPath = string.gsub(statsPath, '\\', '/')
