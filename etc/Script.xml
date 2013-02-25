@@ -12,5 +12,6 @@
 		<Script>autolevel.lua</Script>
 		<Script>opchat.lua</Script>
 		<Script>redirall.lua</Script>
+		<Script>stats.lua</Script>
 	</Engine>
 </ScriptPlugin>
