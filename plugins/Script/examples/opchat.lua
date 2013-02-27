@@ -7,78 +7,15 @@ module("opchat")
 base.require("luadchpp")
 local adchpp = base.luadchpp
 local access = base.require("access")
-local string = base.require('string')
 local autil = base.require("autil")
+local simplebot = base.require("simplebot")
 
-local settings = access.settings
 local commands = access.commands
 local cm = adchpp.getCM()
 local is_op = access.is_op
 
-opchat_bot = nil
-
-access.add_setting('opchat_botcid', {
-	alias = { botid = true },
-
-	help = "CID of the opchat bot, restart the hub after the change",
-
-	value = adchpp.CID_generate():toBase32(),
-
-	validate = function(new)
-		if adchpp.CID(new.value):toBase32() ~= new.value then
-			return "the CID must be a valid 39-byte base32 representation"
-		end
-	end
-})
-
-access.add_setting('opchat_botname', {
-	alias = { botnick = true, botni = true },
-
-	change = function()
-		if opchat_bot then
-			opchat_bot:setField("NI", settings.botname.value)
-			cm:sendToAll(adchpp.AdcCommand(adchpp.AdcCommand_CMD_INF, adchpp.AdcCommand_TYPE_BROADCAST, opchat_bot:getSID()):addParam("NI", settings.botname.value):getBuffer())
-		end
-	end,
-
-	help = "name of the opchat bot",
-
-	value = "OpChat",
-
-	validate = access.validate_ni
-})
-
-access.add_setting('opchat_botdescription', {
-	alias = { botdescr = true, botde = true },
-
-	change = function()
-		if opchat_bot then
-			opchat_bot:setField("DE", settings.botdescription.value)
-			cm:sendToAll(adchpp.AdcCommand(adchpp.AdcCommand_CMD_INF, adchpp.AdcCommand_TYPE_BROADCAST, opchat_bot:getSID()):addParam("DE", settings.botdescription.value):getBuffer())
-		end
-	end,
-
-	help = "description of the opchat bot",
-
-	value = "Operator chat, write here to contact operators",
-
-	validate = access.validate_de
-})
-
-access.add_setting('opchat_botemail', {
-	alias = { botmail = true, botem = true },
-
-	change = function()
-		if opchat_bot then
-			opchat_bot:setField("EM", settings.botemail.value)
-			cm:sendToAll(adchpp.AdcCommand(adchpp.AdcCommand_CMD_INF, adchpp.AdcCommand_TYPE_BROADCAST, opchat_bot:getSID()):addParam("EM", settings.botemail.value):getBuffer())
-		end
-	end,
-
-	help = "e-mail of the opchat bot",
-
-	value = ""
-})
+opchat_bot = simplebot.makeBot (_NAME, 'opchat_', nil, {adchpp.Entity_FLAG_OP,adchpp.Entity_FLAG_SU,adchpp.Entity_FLAG_OWNER},
+			"OpChat", "Operator chat, write here to contact operators").bot
 
 local function doOpSay(c, parameters)
 	if not is_op(c) then
@@ -102,7 +39,6 @@ local function doOpSay(c, parameters)
 	victim:send(pm)
 	autil.reply(c, 'Your message was sent')
 end
-
 
 local function onMSG(c, cmd)
 	if autil.reply_from and autil.reply_from:getSID() == opchat_bot:getSID() then
@@ -140,27 +76,6 @@ local function onMSG(c, cmd)
 	end
 	return true
 end
-
-local function makeBot()
-	local bot = cm:createSimpleBot()
-	bot:setCID(adchpp.CID(settings.opchat_botcid.value))
-	bot:setField("ID", settings.opchat_botcid.value)
-	bot:setField("NI", settings.opchat_botname.value)
-	bot:setField("DE", settings.opchat_botdescription.value)
-	bot:setField("EM", settings.opchat_botemail.value)
-	bot:setFlag(adchpp.Entity_FLAG_BOT)
-	bot:setFlag(adchpp.Entity_FLAG_OP)
-	bot:setFlag(adchpp.Entity_FLAG_SU)
-	bot:setFlag(adchpp.Entity_FLAG_OWNER)
-	return bot
-end
-
-opchat_bot = makeBot()
-cm:regBot(opchat_bot)
-
-autil.on_unloaded(_NAME, function()
-	opchat_bot:disconnect(adchpp.Util_REASON_PLUGIN)
-end)
 
 access.register_handler(adchpp.AdcCommand_CMD_MSG, onMSG)
 

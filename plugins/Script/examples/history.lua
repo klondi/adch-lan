@@ -19,6 +19,7 @@ local string = base.require('string')
 local aio = base.require('aio')
 local autil = base.require('autil')
 local table = base.require('table')
+local simplebot = base.require("simplebot")
 
 local cm = adchpp.getCM()
 local sm = adchpp.getSM()
@@ -238,18 +239,9 @@ if access.settings.history_method.value == 0 then
 	end)
 
 else
-	hidden_bot = cm:createBot(function(bot, buffer)
-		parse(adchpp.AdcCommand(buffer))
-	end)
-	hidden_bot:setField('ID', hidden_bot:getCID():toBase32())
-	hidden_bot:setField('NI', _NAME .. '-hidden_bot')
-	hidden_bot:setField('DE', 'Hidden bot used by the ' .. _NAME .. ' script')
-	hidden_bot:setFlag(adchpp.Entity_FLAG_HIDDEN)
-	cm:regBot(hidden_bot)
-
-	autil.on_unloaded(_NAME, function()
-		hidden_bot:disconnect(adchpp.Util_REASON_PLUGIN)
-	end)
+	local callback = function(bot, buffer) parse(adchpp.AdcCommand(buffer)) end
+	hidden_bot = simplebot.makeBot (_NAME, nil, callback, {adchpp.Entity_FLAG_HIDDEN},
+			_NAME .. '-hidden_bot', 'Hidden bot used by the ' .. _NAME .. ' script').bot
 end
 
 save_messages_timer = sm:addTimedJob(900000, maybe_save_messages)
