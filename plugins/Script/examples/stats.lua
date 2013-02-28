@@ -22,8 +22,8 @@ local bm = badchpp.getBM() -- Bloom manager
 local folder = "FL_DataBase"
 local scriptPath = base.scriptPath .. '/'
 local statsPath = scriptPath .. folder .. '/'
-local statsPath = string.gsub(statsPath, '\\', '/')
-local statsPath = string.gsub(statsPath, '//+', '/')
+statsPath = string.gsub(statsPath, '\\', '/')
+statsPath = string.gsub(statsPath, '//+', '/')
 local file = statsPath .. "stats.txt"
 lm:log(_NAME, file)
 local processStats, append_file
@@ -37,33 +37,29 @@ local sendCallsLast = 0
 local queueCallsLast = 0
 local recvCallsLast = 0
 
-lm:log(_NAME, 'Stats loading')
 
-local function getSocketStats()
-	local sstats = sm:getStats()
-	local stats = {
-		queueCalls = sstats.queueCalls - queueCallsLast,
-		sendCalls = sstats.sendCalls,
-		recvCalls = sstats.recvCalls,
-		queueBytes = sstats.queueBytes,
-		sendBytes = sstats.sendBytes,
-		recvBytes = sstats.recvBytes,
-		
+local cmdStats 
+local function resetcmdstats ()
+	cmdStats = {
+		sch = 0, -- Searchs
+		tth = 0, -- TTH searchs
+		asch = 0, -- Active searchs
+		psch = 0, -- Passive searchs
+		msgs = 0, -- Chat messages
+		pms = 0, -- Private messages
+		bpms = 0, -- private messages to/from bots
+		bsnd = 0, -- bloom filters received
+		inf = 0, -- User information updates (without the initial)
+		res = 0, -- Passive search results received
+		ctm = 0, -- Connection requests
+		rcm = 0, -- Passive connection requests
+		nat = 0,  -- Passive passive connection requests: active connection requests = (ctm-(rcm-nat))
+		conn = 0 -- Connection requests
 	}
-	
-	local sstats = sm:getStats()
-	local sSearch = bm:getSearches()
-	local sTTHSearch = bm:getTTHSearches()
-	local sStoppedSearch = bm:getStoppedSearches()
-
-	local queueCalls = sstats.queueCalls
-	local queueBytes = sstats.queueBytes
-	local sendCalls = sstats.sendCalls 
-	local sendBytes = sstats.sendBytes
-	local recvCalls = sstats.recvCalls
-	local recvBytes = sstats.recvBytes
-	return stats
 end
+resetcmdstats ()
+
+lm:log(_NAME, 'Stats loading')
 
 --These two are not safe you are expected to initialize first
 local function sumstat(table, stat, count)
@@ -141,8 +137,21 @@ local function getUsersTotals()
 	return stats
 end
 
+local function dumpSubt(fname, keyname, valuename, table)
+	f, err = io.open(fname,'w')
+	if not f then
+		lm:log(_NAME, 'Subtable '..fname..' process: ' .. err)
+		return
+	end
+	f:write(keyname..","..valuename.."\n")
+	for k,v in base.pairs(table) do
+		f:write(k..","..v.."\n")
+	end
+	f:close()
+end
+
 local function processStats()
-	local ustats = getUsersTotals() -- TODO: use properly
+	local ustats = getUsersTotals()
 	
 	local shared = ustats.tss
 
@@ -161,10 +170,16 @@ local function processStats()
 	local sendBytesVar = sendBytes - sendBytesLast
 	local queueBytesVar = queueBytes - queueBytesLast
 	local recvBytesVar = recvBytes - recvBytesLast
+	local sendCallsVar = sendCalls - sendCallsLast
+	local queueCallsVar = queueCalls - queueCallsLast
+	local recvCallsVar = recvCalls - recvCallsLast
 
 	sendBytesLast = sendBytes
 	queueBytesLast = queueBytes
 	recvBytesLast = recvBytes
+	sendCallsLast = sendCalls
+	queueCallsLast = queueCalls
+	recvCallsLast = recvCalls
 
 	local uptime = cm:getUpTime()
 	local localtime = os.time()
@@ -173,26 +188,36 @@ local function processStats()
 		   localtime .. "," .. uptime .. "," .. ustats.tss .. "," .. ustats.tsf .. ","
 		.. ustats.tus .. "," .. ustats.tpu .. "," .. ustats.taw	 .. "," .. ustats.tea .. ","
 		.. ustats.tup .. "," .. ustats.tdo .. "," .. ustats.tsl .. "," .. ustats.tfs .. ","
-		.. ustats.thu .. "," .. queueCalls .. "," .. sendCalls .. "," .. recvCalls .. ","
+		.. ustats.thu .. "," .. queueCallsVar .. "," .. sendCallsVar .. "," .. recvCallsVar .. ","
 		.. queueBytesVar .. "," .. sendBytesVar .. "," .. recvBytesVar .. "," .. sSearch
-		.. "," .. sTTHSearch .. "," .. sStoppedSearch .. "\n"
+		.. "," .. sTTHSearch .. "," .. sStoppedSearch .. "," .. cmdStats.sch .. "," .. cmdStats.tth
+		.. "," .. cmdStats.asch .. "," .. cmdStats.psch .. "," .. cmdStats.msgs
+		.. "," .. cmdStats.pms .. "," .. cmdStats.bpms .. "," .. cmdStats.bsnd
+		.. "," .. cmdStats.inf .. "," .. cmdStats.res .. "," .. cmdStats.ctm - (cmdStats.rcm - cmdStats.nat)
+		.. "," .. cmdStats.rcm .. "," .. cmdStats.nat .. "," .. cmdStats.conn .. "\n"
 	)
+	resetcmdstats ()
 
 	f, err = io.open(file,'a+')
 	if not f then
-	  lm:log(_NAME, 'Stats process: ' .. err)
-	  return
-    end
-    f:write(statLine)
-    f:close()
-
-	--os.execute("echo '"..statLine.."' >> "..file)
+		lm:log(_NAME, 'Stats process: ' .. err)
+		return
+	end
+	f:write(statLine)
+	f:close()
+	--Dump the stats subtables
+	dumpSubt(statsPath .. localtime .. "_tap.txt", "aplication", "usercount", ustats.tap)
+	dumpSubt(statsPath .. localtime .. "_tve.txt", "aplication", "usercount", ustats.tve)
+	dumpSubt(statsPath .. localtime .. "_tsu.txt", "aplication", "usercount", ustats.tsu)
+	dumpSubt(statsPath .. localtime .. "_tfe.txt", "aplication", "usercount", ustats.tfe)
+	dumpSubt(statsPath .. localtime .. "_trf.txt", "aplication", "usercount", ustats.trf)
 
 	return statLine
 end
 
 local function prepareFile()
-	headerLine = 'localtime,uptime,shared,sharedFiles,users,passiveUsers,awayUsers,extendedAwayUsers,uploadSpeed,downloadSpeed,slots,freeSlots,hubs,queueCalls,sendCalls,recvCalls,queueBytes,sendBytes,recvBytes,sSearch,sTTHSearch,sStoppedSearch\n'
+	
+	headerLine = 'localtime,uptime,shared,sharedFiles,users,passiveUsers,awayUsers,extendedAwayUsers,uploadSpeed,downloadSpeed,slots,freeSlots,hubs,queueCalls,sendCalls,recvCalls,queueBytes,sendBytes,recvBytes,sSearch,sTTHSearch,sStoppedSearch,searchs,tthSearchs,activeSearchs,passiveSearchs,chatMessages,privateMessages,botPrivateMessagesbloomReceived,infoUpdates,passiveResults,activeConnectionRequests,passiveConnectionRequests,passiveNatRequests,incomingConnections\n'
 	testFile = io.open(file,'r')
 	if not testFile then
 		statsFile = io.open(file,'a+')
@@ -203,8 +228,87 @@ local function prepareFile()
 	end
 end
 
+function receiveparse (cmd) 
+	if cmd:getCommand() == adchpp.AdcCommand_CMD_SCH and cmd:getType() == adchpp.AdcCommand_TYPE_BROADCAST then
+		local from = cm:getEntity(cmd:getFrom())
+		if not from then
+			return
+		end
+
+		sumstat(cmdStats, "sch", 1)
+		if (from:getField("U4") == "") and  (from:getField("U6") == "") then
+			sumstat(cmdStats, "psch", 1)
+		else
+			sumstat(cmdStats, "asch", 1)
+		end
+		if cmd:getParam("TR", 0) ~= "" then
+			sumstat(cmdStats, "tth", 1)
+		end
+	elseif cmd:getCommand() == adchpp.AdcCommand_CMD_MSG then
+		if cmd:getParam("PM", 0) == "" then
+			if cmd:getType() ~= adchpp.AdcCommand_TYPE_BROADCAST then
+				return
+			end
+			sumstat(cmdStats, "msgs", 1)
+		else
+			if cmd:getType() ~= adchpp.AdcCommand_TYPE_DIRECT then
+				return
+			end
+			local from = cm:getEntity(cmd:getFrom())
+			if not from then
+				return
+			end
+			local to = cm:getEntity(cmd:getto())
+			if not to then
+				return
+			end
+			local pm = cm:getEntity(base.tonumber(cmd:getParam("PM", 0)) or 0)
+			if not pm then
+				return
+			end
+			if from:asBot() or to:asBot() or pm:asBot() then
+				sumstat(cmdStats, "pms", 1)
+			else
+				sumstat(cmdStats, "bpms", 1)
+			end
+		end
+
+	elseif cmd:getCommand() == adchpp.AdcCommand_CMD_SND and cmd:getType() == adchpp.AdcCommand_TYPE_HUB then
+		sumstat(cmdStats, "bsnd", 1)
+	elseif cmd:getCommand() == adchpp.AdcCommand_CMD_INF and cmd:getType() == adchpp.AdcCommand_TYPE_BROADCAST then
+		local from = cm:getEntity(cmd:getFrom())
+		if not from then
+			return
+		end
+		if from:getState() == adchpp.Entity_STATE_NORMAL then
+			sumstat(cmdStats, "inf", 1)
+		end
+	elseif cmd:getCommand() == adchpp.AdcCommand_CMD_RES and cmd:getType() == adchpp.AdcCommand_TYPE_DIRECT then
+		sumstat(cmdStats, "res", 1)
+	elseif cmd:getCommand() == adchpp.AdcCommand_CMD_CTM and cmd:getType() == adchpp.AdcCommand_TYPE_DIRECT then
+		sumstat(cmdStats, "ctm", 1)
+	elseif cmd:getCommand() == adchpp.AdcCommand_CMD_RCM and cmd:getType() == adchpp.AdcCommand_TYPE_DIRECT then
+		sumstat(cmdStats, "rcm", 1)
+	elseif cmd:getCommand() == adchpp.AdcCommand_CMD_NAT and cmd:getType() == adchpp.AdcCommand_TYPE_DIRECT then
+		sumstat(cmdStats, "nat", 1)
+	end
+end
+
+stats_1 = cm:signalConnected():connect(function(entity)
+	sumstat(cmdStats, "conn", 1)
+end)
+
+stats_2 = cm:signalReceive():connect(function(entity, cmd, ok)
+	if not ok then
+		return ok
+	end
+
+	receiveparse (cmd) 
+
+	return true
+end)
+
 lm:log(_NAME, 'Registering stats timer ('.. freqMilliseconds ..'ms)')
 sm:addTimedJob(freqMilliseconds,processStats)
 prepareFile()
 processStats()
-
