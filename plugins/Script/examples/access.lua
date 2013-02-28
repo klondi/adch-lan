@@ -579,6 +579,11 @@ function has_level(c, level)
 	return get_level(c) >= level
 end
 
+--TODO: settings and pretty
+function is_org(c)
+	return has_level(c, 3)
+end
+
 function is_op(c)
 	return has_level(c, settings.oplevel.value)
 end
@@ -1503,7 +1508,7 @@ commands.mypass = {
 	end,
 
 	help = "new_pass - change your password, make sure you change it in your client options too",
-
+	--TODO: improve
 	protected = function(c) return settings.allowreg.value ~=0 or has_level(c, 2) end,
 
 	user_command = {

@@ -13,6 +13,7 @@ local commands = access.commands
 local settings = access.settings
 local get_level = access.get_level
 local is_op = access.is_op
+local is_org = access.is_org
 
 local cm = adchpp.getCM()
 
@@ -129,7 +130,7 @@ commands.mass = {
 
 	help = "message [min-level] -no min-level means send to everyone",
 
-	protected = is_op,
+	protected = is_org,
 
 	user_command = {
 		name = "Hub management" .. autil.ucmd_sep .. "Mass message",

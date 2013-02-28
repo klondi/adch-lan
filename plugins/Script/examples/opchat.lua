@@ -13,6 +13,7 @@ local simplebot = base.require("simplebot")
 local commands = access.commands
 local cm = adchpp.getCM()
 local is_op = access.is_op
+local is_org = access.is_org
 
 opchat_bot = simplebot.makeBot (_NAME, 'opchat_', nil, {adchpp.Entity_FLAG_OP,adchpp.Entity_FLAG_SU,adchpp.Entity_FLAG_OWNER},
 			"OpChat", "Operator chat, write here to contact operators").bot
@@ -50,7 +51,7 @@ local function doOpSay(c, parameters)
 	local size = entities:size()
 	for i = 0, size - 1 do
 		local other = entities[i]:asClient()
-		if other and is_op(other) then
+		if other and is_org(other) then
 			mass_cmd:setTo(other:getSID())
 			other:send(mass_cmd)
 		end
@@ -80,13 +81,13 @@ local function onMSG(c, cmd)
 
 		for i = 0, size - 1 do
 			local other = entities[i]:asClient()
-			if other and is_op(other) then
+			if other and is_org(other) then
 				mass_cmd:setTo(other:getSID())
 				other:send(mass_cmd)
 			end
 		end
 
-		if not is_op(c) then
+		if not is_org(c) then
 			autil.reply(c, 'Your message was sent')
 		end
 		return false

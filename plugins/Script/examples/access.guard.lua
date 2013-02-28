@@ -66,6 +66,7 @@ local kickstats_file = fldb_path .. "kickstats.txt"
 local entitystats_file = fldb_path .. "entitystats.txt"
 
 -- Setting the level for administrating commands, viewing the stats and script's bans
+--TODO make configurable
 local level_admin = 9
 local level_stats = access.settings.oplevel.value
 local level_script = access.settings.oplevel.value
