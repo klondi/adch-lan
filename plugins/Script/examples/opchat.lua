@@ -21,6 +21,11 @@ local function doOpSay(c, parameters)
 	if not is_op(c) then
 		return
 	end
+	local nick = c:getField("NI")
+	if #nick < 1 then
+		return
+	end
+
 	local user, message = parameters:match("^(%S+) (.+)")
 
 	if not user or #user <= 0 or not message or #message <= 0 then
@@ -37,7 +42,19 @@ local function doOpSay(c, parameters)
 
 	local pm = autil.pm(message, opchat_bot:getSID()+0, victim:getSID()+0)
 	victim:send(pm)
-	autil.reply(c, 'Your message was sent')
+	local mass_cmd = adchpp.AdcCommand(adchpp.AdcCommand_CMD_MSG, adchpp.AdcCommand_TYPE_DIRECT, opchat_bot:getSID()+0)
+	:addParam('Said on behalf of '..nick..' to '..user..' the message '..message)
+	:addParam("PM", adchpp.AdcCommand_fromSID(opchat_bot:getSID()+0))
+		
+	local entities = cm:getEntities()
+	local size = entities:size()
+	for i = 0, size - 1 do
+		local other = entities[i]:asClient()
+		if other and is_op(other) then
+			mass_cmd:setTo(other:getSID())
+			other:send(mass_cmd)
+		end
+	end
 end
 
 local function onMSG(c, cmd)
