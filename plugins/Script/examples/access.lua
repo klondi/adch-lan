@@ -568,10 +568,26 @@ end
 function set_level(c, level)
 	c:setPluginData(levelHandle, level)
 	--Handle the OP flags
-	if level >= settings.oplevel.value then
+	--TODO change for config
+	if level >= 2 then
+		c:setFlag(adchpp.Entity_FLAG_REGISTERED)
+	else
+		c:unsetFlag(adchpp.Entity_FLAG_REGISTERED)
+	end
+	if level >= 3 then
 		c:setFlag(adchpp.Entity_FLAG_OP)
 	else
 		c:unsetFlag(adchpp.Entity_FLAG_OP)
+	end
+	if level >= settings.oplevel.value then
+		c:setFlag(adchpp.Entity_FLAG_SU)
+	else
+		c:unsetFlag(adchpp.Entity_FLAG_SU)
+	end
+	if level >= settings.admlevel.value then
+		c:setFlag(adchpp.Entity_FLAG_OWNER)
+	else
+		c:unsetFlag(adchpp.Entity_FLAG_OWNER)
 	end
 end
 
