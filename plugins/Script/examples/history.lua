@@ -12,11 +12,18 @@ local access = base.access
 
 -- Where to read/write history file - set to nil to disable persistent history
 local history_file = adchpp.Util_getCfgPath() .. "history.txt"
+local history_txt_file = adchpp.Util_getCfgPath() .. "history_txt.txt"
+local history_txt_f
+local history_sch_file = adchpp.Util_getCfgPath() .. "history_sch.txt"
+local history_sch_f
+local history_tth_file = adchpp.Util_getCfgPath() .. "history_tth.txt"
+local history_tth_f
 
 local os = base.require('os')
 local json = base.require('json')
 local string = base.require('string')
 local aio = base.require('aio')
+local io = base.require('io')
 local autil = base.require('autil')
 local table = base.require('table')
 local simplebot = base.require("simplebot")
@@ -216,6 +223,11 @@ local function parse(cmd)
 	messages[pos] = { message = message, htime = os.time() }
 	pos = pos + 1
 
+	local fmessage = message
+	fmessage = string.gsub(fmessage,'\\','\\\\')
+	fmessage = string.gsub(fmessage,'\n','\\n')
+	fmessage = fmessage.."\n"
+	history_txt_f:write(fmessage)
 	messages_saved = false
 end
 
@@ -248,3 +260,52 @@ save_messages_timer = sm:addTimedJob(900000, maybe_save_messages)
 autil.on_unloading(_NAME, save_messages_timer)
 
 autil.on_unloading(_NAME, maybe_save_messages)
+
+history_txt_f = io.open(history_txt_file,"a")
+history_sch_f = io.open(history_sch_file,"a")
+history_tth_f = io.open(history_tth_file,"a")
+autil.on_unloading(_NAME, function ()
+	history_txt_f:close()
+	history_sch_f:close()
+	history_tth_f:close()
+end)
+flush_messages_timer = sm:addTimedJob(1000, function ()
+	history_txt_f:flush()
+	history_sch_f:flush()
+	history_tth_f:flush()
+end)
+
+history_2 = cm:signalReceive():connect(function(entity, cmd, ok)
+	if not ok then
+		return ok
+	end
+
+	if cmd:getCommand() ~= adchpp.AdcCommand_CMD_SCH or cmd:getType() ~= adchpp.AdcCommand_TYPE_BROADCAST then
+		return true
+	end
+
+	local now = os.date(access.settings.history_prefix.value)
+	
+	
+	if cmd:getParam("TR", 1) == "" then
+		local params = cmd:getParameters()
+		local paramsize =  params:size()
+		local message = now
+		for i = 0, paramsize - 1 do
+			local npar = params[i]
+			if string.sub(npar,1,2) ~= "TO" then
+				npar = string.gsub(npar,'\\','\\\\')
+				npar = string.gsub(npar,'\n','\\n')
+				npar = string.gsub(npar,' ','\\s')
+				message = message .. ' ' .. npar
+			end
+		end
+		history_sch_f:write(message..'\n')
+	else
+		local message = now .. ' ' .. cmd:getParam("TR", 1) .. '\n'
+		history_tth_f:write(message)
+	end
+
+	return true
+end)
+
