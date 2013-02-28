@@ -4,10 +4,15 @@ local base = _G
 -- Requires that the Bloom plugin is loaded
 
 module("checkbloomdb")
+bloom=false
+
 base.require('luadchpp')
 local adchpp = base.luadchpp
 base.require('luadchppbloom')
-local badchpp = base.luadchppbloom
+if bloom then
+	local badchpp = base.luadchppbloom
+	local bm = badchpp.getBM()
+end
 local access = base.require("access")
 
 local string = base.require('string')
@@ -17,7 +22,6 @@ local table = base.require('table')
 local autil = base.require('autil')
 local simplebot = base.require("simplebot")
 
-local bm = badchpp.getBM()
 local cm = adchpp.getCM()
 
 -- Where to read unwanted TTH list
@@ -87,7 +91,7 @@ access.register_handler(adchpp.AdcCommand_CMD_RES, onRES)
 
 checkdb_1 = adchpp.getCM():signalState():connect(function(entity)
 	if entity:getState() == adchpp.Entity_STATE_NORMAL then
-		if bm:hasBloom(entity) then
+		if bloom and bm:hasBloom(entity) then
 			for tth, reason in base.pairs(unwanted) do
 				if bm:hasTTH(entity, tth) then
 					-- TODO: do actions

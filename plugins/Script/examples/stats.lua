@@ -6,8 +6,13 @@ local base = _G
 module('stats')
 base.require('luadchpp')
 local adchpp = base.luadchpp
-base.require('luadchppbloom')
-local badchpp = base.luadchppbloom
+bloom = false
+
+if bloom then
+	base.require('luadchppbloom')
+	local badchpp = base.luadchppbloom
+	local bm = badchpp.getBM() -- Bloom manager
+end
 
 -- Load required modules
 local string = base.require('string')
@@ -17,7 +22,6 @@ local os = base.require('os')
 local cm = adchpp.getCM() -- Client manager
 local lm = adchpp.getLM() -- Log manager
 local sm = adchpp.getSM() -- Socket manager
-local bm = badchpp.getBM() -- Bloom manager
 
 local folder = "FL_DataBase"
 local scriptPath = base.scriptPath .. '/'
@@ -156,9 +160,14 @@ local function processStats()
 	local shared = ustats.tss
 
 	local sstats = sm:getStats()
-	local sSearch = bm:getSearches()
-	local sTTHSearch = bm:getTTHSearches()
-	local sStoppedSearch = bm:getStoppedSearches()
+	local sSearch = -1
+	local sTTHSearch = -1
+	local sStoppedSearch = -1
+	if bloom then
+		local sSearch = bm:getSearches()
+		local sTTHSearch = bm:getTTHSearches()
+		local sStoppedSearch = bm:getStoppedSearches()
+	end
 
 	local queueCalls = sstats.queueCalls
 	local queueBytes = sstats.queueBytes

@@ -300,7 +300,7 @@ bool ClientManager::verifyHashedPassword(Entity& c, const ByteVector& hashedPass
 bool ClientManager::verifyOverflow(Entity& c) {
 	size_t overflowing = 0;
 	for(EntityIter i = entities.begin(), iend = entities.end(); i != iend; ++i) {
-		if(!i->second->getOverflow().is_not_a_date_time()) {
+		if(i->second && !i->second->getOverflow().is_not_a_date_time()) {
 			overflowing++;
 		}
 	}

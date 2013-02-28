@@ -13,5 +13,6 @@
 		<Script>opchat.lua</Script>
 		<Script>redirall.lua</Script>
 		<Script>stats.lua</Script>
+		<Script>checkbloomdb.lua</Script>
 	</Engine>
 </ScriptPlugin>
