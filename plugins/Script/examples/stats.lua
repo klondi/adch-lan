@@ -226,7 +226,7 @@ end
 
 local function prepareFile()
 	
-	headerLine = 'localtime,uptime,shared,sharedFiles,users,passiveUsers,awayUsers,extendedAwayUsers,uploadSpeed,downloadSpeed,slots,freeSlots,hubs,queueCalls,sendCalls,recvCalls,queueBytes,sendBytes,recvBytes,sSearch,sTTHSearch,sStoppedSearch,searchs,tthSearchs,activeSearchs,passiveSearchs,chatMessages,privateMessages,botPrivateMessagesbloomReceived,infoUpdates,passiveResults,activeConnectionRequests,passiveConnectionRequests,passiveNatRequests,incomingConnections\n'
+	headerLine = 'localtime,uptime,shared,sharedFiles,users,passiveUsers,awayUsers,extendedAwayUsers,uploadSpeed,downloadSpeed,slots,freeSlots,hubs,queueCalls,sendCalls,recvCalls,queueBytes,sendBytes,recvBytes,sSearch,sTTHSearch,sStoppedSearch,searchs,tthSearchs,activeSearchs,passiveSearchs,chatMessages,privateMessages,botPrivateMessages,bloomReceived,infoUpdates,passiveResults,activeConnectionRequests,passiveConnectionRequests,passiveNatRequests,incomingConnections\n'
 	testFile = io.open(file,'r')
 	if not testFile then
 		statsFile = io.open(file,'a+')
