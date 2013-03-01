@@ -269,7 +269,7 @@ settings.oplevel = {
 
 	level = true,
 
-	value = 3
+	value = 5
 }
 
 settings.admlevel = {
@@ -283,7 +283,21 @@ settings.admlevel = {
 
         level = true,
 
-        value = 5
+        value = 6
+}
+
+settings.orglevel = {
+        alias = { levelorg = true },
+
+        change = function()
+        	level_org = settings.orglevel.value
+        end,
+
+        help = "minimum level for administrator users, all users >= this level will have organizer rights",
+
+        level = true,
+
+        value = 3
 }
 
 settings.minchatlevel = {
@@ -552,6 +566,11 @@ function get_user(cid, nick)
 	return user
 end
 
+function is_reg (c)
+	return get_user(c:getCID():toBase32(), c:getField("NI")).default_user ~= true
+end
+
+
 function get_user_c(c)
 	return get_user(c:getCID():toBase32(), c:getField("NI"))
 end
@@ -568,13 +587,12 @@ end
 function set_level(c, level)
 	c:setPluginData(levelHandle, level)
 	--Handle the OP flags
-	--TODO change for config
-	if level >= 2 then
+	if is_reg(c) then
 		c:setFlag(adchpp.Entity_FLAG_REGISTERED)
 	else
 		c:unsetFlag(adchpp.Entity_FLAG_REGISTERED)
 	end
-	if level >= 3 then
+	if level >= settings.orglevel.value then
 		c:setFlag(adchpp.Entity_FLAG_OP)
 	else
 		c:unsetFlag(adchpp.Entity_FLAG_OP)
@@ -595,9 +613,8 @@ function has_level(c, level)
 	return get_level(c) >= level
 end
 
---TODO: settings and pretty
 function is_org(c)
-	return has_level(c, 3)
+	return has_level(c, settings.orglevel.value)
 end
 
 function is_op(c)
@@ -1524,8 +1541,7 @@ commands.mypass = {
 	end,
 
 	help = "new_pass - change your password, make sure you change it in your client options too",
-	--TODO: improve
-	protected = function(c) return settings.allowreg.value ~=0 or has_level(c, 2) end,
+	protected = function(c) return settings.allowreg.value ~=0 or is_reg(c) end,
 
 	user_command = {
 		name = "My pass",
