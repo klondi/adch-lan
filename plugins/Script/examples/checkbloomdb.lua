@@ -8,10 +8,12 @@ bloom=false
 
 base.require('luadchpp')
 local adchpp = base.luadchpp
-base.require('luadchppbloom')
+local badchpp
+local bm
 if bloom then
-	local badchpp = base.luadchppbloom
-	local bm = badchpp.getBM()
+	base.require('luadchppbloom')
+	badchpp = base.luadchppbloom
+	bm = badchpp.getBM()
 end
 local access = base.require("access")
 
@@ -91,9 +93,9 @@ access.register_handler(adchpp.AdcCommand_CMD_RES, onRES)
 
 checkdb_1 = adchpp.getCM():signalState():connect(function(entity)
 	if entity:getState() == adchpp.Entity_STATE_NORMAL then
-		if bloom and bm:hasBloom(entity) then
+		if not bloom or bm:hasBloom(entity) then
 			for tth, reason in base.pairs(unwanted) do
-				if bm:hasTTH(entity, tth) then
+				if not bloom or bm:hasTTH(entity, tth) then
 					-- TODO: do actions
 					local cmd = adchpp.AdcCommand(adchpp.AdcCommand_CMD_SCH, adchpp.AdcCommand_TYPE_BROADCAST, search_bot:getSID())
 					cmd:addParam("TR",tth)

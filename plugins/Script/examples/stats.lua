@@ -7,11 +7,13 @@ module('stats')
 base.require('luadchpp')
 local adchpp = base.luadchpp
 bloom = false
+local badchpp
+local bm
 
 if bloom then
 	base.require('luadchppbloom')
-	local badchpp = base.luadchppbloom
-	local bm = badchpp.getBM() -- Bloom manager
+	badchpp = base.luadchppbloom
+	bm = badchpp.getBM() -- Bloom manager
 end
 
 -- Load required modules
