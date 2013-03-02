@@ -169,7 +169,7 @@ void ManagedSocket::prepareRead2(const boost::system::error_code& ec, size_t) th
 		// and thus read_some will block
 		// If there's no user data, this will effectively post a read operation
 		// with a buffer and waste memory...to be continued.
-		inBuf = make_shared<Buffer>(64);
+		inBuf = make_shared<Buffer>(65536);
 
 		sock->prepareRead(inBuf, Handler<&ManagedSocket::completeRead>(shared_from_this()));
 	} else {
