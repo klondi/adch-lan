@@ -254,7 +254,7 @@ function receiveparse (cmd)
 			sumstat(cmdStats, "tth", 1)
 		end
 	elseif cmd:getCommand() == adchpp.AdcCommand_CMD_MSG then
-		if cmd:getParam("PM", 0) == "" then
+		if cmd:getParam("PM", 1) == "" then
 			if cmd:getType() ~= adchpp.AdcCommand_TYPE_BROADCAST then
 				return
 			end
