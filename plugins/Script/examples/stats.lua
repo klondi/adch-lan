@@ -195,7 +195,7 @@ local function processStats()
 	local uptime = cm:getUpTime()
 	local localtime = os.time()
 	-- TODO add command stats
-	local statLine = (
+	local statLine = string.format("%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f\n"
 		   localtime .. "," .. uptime .. "," .. ustats.tss .. "," .. ustats.tsf .. ","
 		.. ustats.tus .. "," .. ustats.tpu .. "," .. ustats.taw	 .. "," .. ustats.tea .. ","
 		.. ustats.tup .. "," .. ustats.tdo .. "," .. ustats.tsl .. "," .. ustats.tfs .. ","
