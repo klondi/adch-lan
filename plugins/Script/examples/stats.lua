@@ -195,17 +195,17 @@ local function processStats()
 	local uptime = cm:getUpTime()
 	local localtime = os.time()
 	-- TODO add command stats
-	local statLine = string.format("%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f\n",
+	local statLine = string.format("%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f,%.f\n",
 		   localtime , uptime , ustats.tss , ustats.tsf ,
 		   ustats.tus , ustats.tpu , ustats.taw	 , ustats.tea ,
 		   ustats.tup , ustats.tdo , ustats.tsl , ustats.tfs ,
 		   ustats.thu , queueCallsVar , sendCallsVar , recvCallsVar ,
-		   queueBytesVar , sendBytesVar , recvBytesVar , sSearch
-		, sTTHSearch , sStoppedSearch , cmdStats.sch , cmdStats.tth
-		, cmdStats.asch , cmdStats.psch , cmdStats.msgs
-		, cmdStats.pms , cmdStats.bpms , cmdStats.bsnd
-		, cmdStats.inf , cmdStats.res , cmdStats.ctm - (cmdStats.rcm - cmdStats.nat)
-		, cmdStats.rcm , cmdStats.nat , cmdStats.conn
+		   queueBytesVar , sendBytesVar , recvBytesVar , sSearch,
+		   sTTHSearch , sStoppedSearch , cmdStats.sch , cmdStats.tth,
+		   cmdStats.asch , cmdStats.psch , cmdStats.msgs,
+		   cmdStats.pms , cmdStats.bpms , cmdStats.bsnd,
+		   cmdStats.inf , cmdStats.res , cmdStats.ctm - (cmdStats.rcm - cmdStats.nat),
+		   cmdStats.rcm , cmdStats.nat , cmdStats.conn
 	)
 	resetcmdstats ()
 
