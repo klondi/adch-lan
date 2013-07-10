@@ -305,6 +305,11 @@ bool ClientManager::verifyOverflow(Entity& c) {
 		}
 	}
 
+	if(overflowing > 3 && overflowing > (entities.size() / 4)) {
+		disconnect(c, Util::REASON_NO_BANDWIDTH, "Not enough bandwidth available, please try again later", AdcCommand::ERROR_HUB_FULL);
+		return false;
+	}
+
 	return true;
 }
 
