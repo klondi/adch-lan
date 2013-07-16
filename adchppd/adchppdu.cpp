@@ -65,9 +65,14 @@ static void init() {
 	sigdelset(&mask, SIGCONT);
 	sigdelset(&mask, SIGFPE);
 	sigdelset(&mask, SIGILL);
+#if SIGBUS
+	sigdelset(&mask, SIGBUS); //OS dependent, similar to SIGSEGV
+#endif
+	sigdelset(&mask, SIGABRT); //This signal is also important since bugs may be caught by it
 	sigdelset(&mask, SIGSEGV);
 	sigdelset(&mask, SIGBUS);
 	sigdelset(&mask, SIGINT);
+	sigdelset(&mask, SIGTERM); // Terminate signal as sent by kill
 	sigdelset(&mask, SIGTRAP);
 	pthread_sigmask(SIG_SETMASK, &mask, NULL);
 
@@ -87,6 +92,7 @@ static void installHandler() {
 	sa.sa_handler = breakHandler;
 
 	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGTERM, &sa, NULL);
 }
 
 static void uninit() {
