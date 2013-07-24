@@ -11,6 +11,8 @@
 		<Script>history.lua</Script>
 		<Script>autolevel.lua</Script>
 		<Script>opchat.lua</Script>
+		<Script>adminchat.lua</Script>
+		<Script>comercio.lua</Script>
 		<Script>redirall.lua</Script>
 		<Script>stats.lua</Script>
 		<Script>checkbloomdb.lua</Script>
