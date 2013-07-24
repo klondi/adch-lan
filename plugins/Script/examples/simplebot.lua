@@ -136,17 +136,19 @@ local function chatRoomCallback (bot, buffer)
 	local boto = bots[bot:getSID()]
 	cmd = adchpp.AdcCommand(buffer)
 	if cmd:getCommand() ~= adchpp.AdcCommand_CMD_MSG or (cmd:getType() ~= adchpp.AdcCommand_TYPE_DIRECT  and cmd:getType() ~= adchpp.AdcCommand_TYPE_ECHO) or cmd:getParam("PM", 1) == "" then
-		return
+		return false
 	end
 	local from = cm:getEntity(cmd:getFrom())
 	if not from then
-		return
+		return false
 	end
 	local msg = cmd:getParam(0)
 
 	if (msg:sub(1,1) == "+") then
 		pcmd,pargs=msg:match("\+(%S+)%s*(.*)")
-		pcmd = pcmd:lower()
+		if pcmd then
+			pcmd = pcmd:lower()
+		end
 		if(boto.cmdcallback[pcmd] and not boto.cmdcallback[pcmd](boto,from,pcmd, pargs)) then
 			return
 		end
@@ -166,6 +168,7 @@ local function chatRoomCallback (bot, buffer)
 	if( not boto.msgcallback or boto.msgcallback(boto,from,msg)) then
 		boto:send(from, msg)
 	end
+	return false
 end
 
 -- Usage: makeBot (_NAME, botname, callback=nil, flags={}, withsettings=true, defname=botname, defdescription="", defemail="", defcid=adchpp.CID_generate():toBase32())
