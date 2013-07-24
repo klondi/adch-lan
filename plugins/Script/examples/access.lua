@@ -293,7 +293,21 @@ settings.orglevel = {
         	level_org = settings.orglevel.value
         end,
 
-        help = "minimum level for administrator users, all users >= this level will have organizer rights",
+        help = "minimum level for organizator users, all users >= this level will have organizer rights",
+
+        level = true,
+
+        value = 4
+}
+
+settings.poplevel = {
+        alias = { levelpop = true },
+
+        change = function()
+        	level_pop = settings.poplevel.value
+        end,
+
+        help = "minimum level for pseudo op users (have access to opchat), all users >= this level will have organizer rights",
 
         level = true,
 
@@ -615,6 +629,10 @@ end
 
 function is_org(c)
 	return has_level(c, settings.orglevel.value)
+end
+
+function is_pop(c)
+	return has_level(c, settings.poplevel.value)
 end
 
 function is_op(c)
