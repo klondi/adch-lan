@@ -13,7 +13,7 @@ local simplebot = base.require("simplebot")
 local commands = access.commands
 local cm = adchpp.getCM()
 
-admchat_com = simplebot.makeBot (_NAME, 'comchat_', nil, {adchpp.Entity_FLAG_OP,adchpp.Entity_FLAG_SU,adchpp.Entity_FLAG_OWNER},
+comchat_bot = simplebot.makeBot (_NAME, 'comchat_', nil, {adchpp.Entity_FLAG_OP,adchpp.Entity_FLAG_SU,adchpp.Entity_FLAG_OWNER},
 			"Comercio", "Chat de Comercio").bot
 
 local function onMSG(c, cmd)
