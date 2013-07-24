@@ -5,6 +5,7 @@ local base = _G
 
 module('stats')
 base.require('luadchpp')
+local os = base.require("os")
 local adchpp = base.luadchpp
 bloom = false
 local badchpp
@@ -27,10 +28,10 @@ local sm = adchpp.getSM() -- Socket manager
 
 local folder = "FL_DataBase"
 local scriptPath = base.scriptPath .. '/'
-local statsPath = scriptPath .. folder .. '/'
+local statsPath = scriptPath .. folder .. '/stats'
 statsPath = string.gsub(statsPath, '\\', '/')
 statsPath = string.gsub(statsPath, '//+', '/')
-local file = statsPath .. "stats.txt"
+local file = scriptPath .. folder .. "/stats.txt"
 lm:log(_NAME, file)
 local processStats, append_file
 
@@ -217,11 +218,11 @@ local function processStats()
 	f:write(statLine)
 	f:close()
 	--Dump the stats subtables
-	dumpSubt(statsPath .. localtime .. "_tap.txt", "aplication", "usercount", ustats.tap)
-	dumpSubt(statsPath .. localtime .. "_tve.txt", "aplication", "usercount", ustats.tve)
-	dumpSubt(statsPath .. localtime .. "_tsu.txt", "aplication", "usercount", ustats.tsu)
-	dumpSubt(statsPath .. localtime .. "_tfe.txt", "aplication", "usercount", ustats.tfe)
-	dumpSubt(statsPath .. localtime .. "_trf.txt", "aplication", "usercount", ustats.trf)
+	dumpSubt(statsPath .. "_tap/" .. localtime .. "_tap.txt", "aplication", "usercount", ustats.tap)
+	dumpSubt(statsPath .. "_tve/" .. localtime .. "_tve.txt", "aplication", "usercount", ustats.tve)
+	dumpSubt(statsPath .. "_tsu/" .. localtime .. "_tsu.txt", "aplication", "usercount", ustats.tsu)
+	dumpSubt(statsPath .. "_tfe/" .. localtime .. "_tfe.txt", "aplication", "usercount", ustats.tfe)
+	dumpSubt(statsPath .. "_trf/" .. localtime .. "_trf.txt", "aplication", "usercount", ustats.trf)
 
 	return statLine
 end
@@ -323,3 +324,12 @@ lm:log(_NAME, 'Registering stats timer ('.. freqMilliseconds ..'ms)')
 sm:addTimedJob(freqMilliseconds,processStats)
 prepareFile()
 processStats()
+
+local function gen_stats_folders()
+	os.execute("mkdir ".. statsPath .. "_tap/")
+	os.execute("mkdir ".. statsPath .. "_tve/")
+	os.execute("mkdir ".. statsPath .. "_tsu/")
+	os.execute("mkdir ".. statsPath .. "_tfe/")
+	os.execute("mkdir ".. statsPath .. "_trf/")
+end
+
