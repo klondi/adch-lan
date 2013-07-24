@@ -22,7 +22,7 @@ local function onMSG(c, cmd)
 
 		local mass_cmd = adchpp.AdcCommand(adchpp.AdcCommand_CMD_MSG, adchpp.AdcCommand_TYPE_DIRECT, c:getSID()+0)
 		:addParam(msg)
-		:addParam("PM", adchpp.AdcCommand_fromSID(comchat_bot:getSID()+0))
+		:addParam("PM", adchpp.AdcCommand_fromSID(supchat_bot:getSID()+0))
 		
 		local entities = cm:getEntities()
 		local size = entities:size()
