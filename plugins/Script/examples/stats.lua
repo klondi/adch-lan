@@ -333,3 +333,4 @@ local function gen_stats_folders()
 	os.execute("mkdir ".. statsPath .. "_trf/")
 end
 
+gen_stats_folders()
