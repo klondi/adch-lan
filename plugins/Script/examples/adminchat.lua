@@ -33,7 +33,7 @@ local function onMSG(c, cmd)
 
 		for i = 0, size - 1 do
 			local other = entities[i]:asClient()
-			if other and is_adm(other) and not other == c then
+			if other and is_adm(other) then
 				mass_cmd:setTo(other:getSID())
 				other:send(mass_cmd)
 			end
