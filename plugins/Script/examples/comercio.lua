@@ -38,7 +38,6 @@ local function onMSG(c, cmd)
 			end
 		end
 
-		autil.reply(c, 'Your message was sent')
 		return false
 	end
 	return true
