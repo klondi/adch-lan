@@ -351,7 +351,7 @@ bool ClientManager::verifyIp(Client& c, AdcCommand& cmd) throw() {
 			dcdebug("%s verifying IP %s\n", AdcCommand::fromSID(c.getSID()).c_str(), ip.c_str());
 			if(ip.empty() || address_v4::from_string(ip) == address_v4::any()) {
 				cmd.delParam("I4", 0);
-			} else if(address_v4::from_string(ip) != v4 && !Util::isPrivateIp(c.getIp())) {
+			} else if(address_v4::from_string(ip) != v4 && !Util::isPrivateIp(c.getIp()) && !Util::isPrivateIp(ip)) {
 				disconnect(c, Util::REASON_INVALID_IP, "Your IP is " + c.getIp() +
 					", reconfigure your client settings", AdcCommand::ERROR_BAD_IP, "IP" + c.getIp());
 				return false;
